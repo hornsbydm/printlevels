@@ -23,6 +23,7 @@ const (
 	oid_sys_location string = "1.3.6.1.2.1.1.6.0"
 	oid_sys_name     string = "1.3.6.1.2.1.1.5.0"
 	oid_sys_contact  string = "1.3.6.1.2.1.1.4.0"
+	oid_sys_model    string = "1.3.6.1.2.1.1.1.0"
 )
 
 func main() {
@@ -80,7 +81,7 @@ func printQuit(e error) {
 
 func isLow(v float32) string {
 	if v < 20 {
-		return "***"
+		return "\u25c0"
 	}
 	return ""
 }
