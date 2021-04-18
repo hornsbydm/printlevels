@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/gosnmp/gosnmp"
 )
@@ -26,12 +28,9 @@ const (
 )
 
 func main() {
-	csvfile, err := os.Open("Printer.csv")
-	if err != nil {
-		printQuit(err)
-	}
+	r := setupCSV("Printer.csv")
 
-	r := csv.NewReader(csvfile)
+	var wg sync.WaitGroup
 
 	for {
 		record, err := r.Read()
@@ -41,36 +40,53 @@ func main() {
 			}
 			printQuit(err)
 		}
-		var printLevel int
-		if isOID, OID := parseOID(record[level]); isOID {
-			printLevel = getSNMPInt(record[host], OID)
-		} else {
-			printLevel, err = strconv.Atoi(OID)
-			if err != nil {
-				printQuit(errors.New("bad manual value"))
-			}
-		}
-
-		var printCap int
-		if isOID, OID := parseOID(record[cap]); isOID {
-			printCap = getSNMPInt(record[host], OID)
-		} else {
-			printCap, err = strconv.Atoi(OID)
-			if err != nil {
-				printQuit(errors.New("bad manual value"))
-			}
-		}
-		levelPercent := float32(printLevel) / float32(printCap) * 100
-
-		fmt.Printf("%-24v %-24s (%d/%d) %.2f%%%v\n",
-			getSNMPString(record[host], oid_sys_name),
-			record[descr],
-			printLevel,
-			printCap,
-			levelPercent,
-			isLow(levelPercent))
-
+		go run(&wg, record)
+		wg.Add(1)
 	}
+	wg.Wait()
+}
+func setupCSV(filename string) *csv.Reader {
+	csvfile, err := os.Open(filename)
+	if err != nil {
+		printQuit(err)
+	}
+
+	return csv.NewReader(csvfile)
+}
+
+func run(wg *sync.WaitGroup, record []string) {
+	defer wg.Done()
+	//	fmt.Println(record)
+	var err error
+	var printLevel int
+	if isOID, OID := parseOID(record[level]); isOID {
+		printLevel = getSNMPInt(record[host], OID)
+	} else {
+		printLevel, err = strconv.Atoi(OID)
+		if err != nil {
+			printQuit(errors.New("bad manual value"))
+		}
+	}
+
+	var printCap int
+	if isOID, OID := parseOID(record[cap]); isOID {
+		printCap = getSNMPInt(record[host], OID)
+	} else {
+		printCap, err = strconv.Atoi(OID)
+		if err != nil {
+			printQuit(errors.New("bad manual value"))
+		}
+	}
+	levelPercent := float32(printLevel) / float32(printCap) * 100
+
+	fmt.Printf("%-24v %-24s (%d/%d) %.2f%%%v\n",
+		getSNMPString(record[host], oid_sys_name),
+		record[descr],
+		printLevel,
+		printCap,
+		levelPercent,
+		isLow(levelPercent))
+
 }
 
 func printQuit(e error) {
@@ -94,13 +110,22 @@ func getSNMPString(host string, oid string) string {
 }
 
 func getSNMPValue(host string, oid string) interface{} {
-	gosnmp.Default.Target = host
-	if err := gosnmp.Default.Connect(); err != nil {
+
+	params := &gosnmp.GoSNMP{
+		Target:    host,
+		Port:      161,
+		Community: "public",
+		Version:   gosnmp.Version2c,
+		//Logger:    log.New(os.Stdout, "", 0),
+		Timeout: time.Duration(2) * time.Second,
+	}
+
+	if err := params.Connect(); err != nil {
 		printQuit(err)
 	}
-	defer gosnmp.Default.Conn.Close()
+	defer params.Conn.Close()
 
-	retVal, err := gosnmp.Default.Get([]string{oid})
+	retVal, err := params.Get([]string{oid})
 	if err != nil {
 		printQuit(err)
 	}
