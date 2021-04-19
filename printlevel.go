@@ -1,24 +1,11 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
-	"flag"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"sync"
-)
-
-type printerCol int
-
-const (
-	descr printerCol = iota
-	host             = iota
-	level            = iota
-	cap              = iota
-	model            = iota
 )
 
 const (
@@ -28,41 +15,7 @@ const (
 	oid_sys_model    string = "1.3.6.1.2.1.1.1.0"
 )
 
-func main() {
-
-	filePtr := flag.String("f", "printer.csv", "Path to csv printer file.")
-	flag.Parse()
-
-	r := setupCSV(*filePtr)
-	var wg sync.WaitGroup
-
-	for {
-		record, err := r.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			printQuit(err)
-		}
-		go run(&wg, record)
-		wg.Add(1)
-	}
-	wg.Wait()
-}
-
-func setupCSV(filename string) (csvReader *csv.Reader) {
-	csvfile, err := os.Open(filename)
-	if err != nil {
-		printQuit(err)
-	}
-
-	csvReader = csv.NewReader(csvfile)
-	csvReader.Comment = '#'
-
-	return
-}
-
-func run(wg *sync.WaitGroup, record []string) {
+func poll(wg *sync.WaitGroup, record []string) {
 	defer wg.Done()
 	//	fmt.Println(record)
 	var err error
