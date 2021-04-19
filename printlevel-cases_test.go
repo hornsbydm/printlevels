@@ -18,11 +18,13 @@ var parseOIDCases = []struct {
 		false,
 		"100",
 	},
-	{"manual value 1 digit",
+	{
+		"manual value 1 digit",
 		"M1",
 		false,
 		"1"},
-	{"manual no value",
+	{
+		"manual no value",
 		"M",
 		false,
 		"0"},

@@ -1,6 +1,3 @@
-#Consumable Description,Level OID, Capacity OID, Replacement Model
-#Corp
-#Net1
 Toner Black,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.4,1.3.6.1.2.1.43.11.1.1.8.1.4,Replacement Model
 Toner Cyan,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.1,1.3.6.1.2.1.43.11.1.1.8.1.1,Replacement Model
 Toner Magenta,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.2,1.3.6.1.2.1.43.11.1.1.8.1.2,Replacement Model
@@ -16,7 +13,6 @@ Developer Gold,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.10,1.3.6.1.2.1.43.11.1.1.8.1.
 Waste Toner,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.13,1.3.6.1.2.1.43.11.1.1.8.1.13,Replacement Model
 Fuser,10.10.2.1,1.3.6.1.2.1.43.11.1.1.9.1.14,1.3.6.1.2.1.43.11.1.1.8.1.14,Replacement Model
 Print Meter,10.10.2.1,1.3.6.1.2.1.43.10.2.1.4.1.1,M0,Replacement Model
-#Lockland Sales Counter
 Toner Black Level,10.10.2.7,1.3.6.1.2.1.43.11.1.1.9.1.1,1.3.6.1.2.1.43.11.1.1.8.1.1,24B6186
 Imaging Unit Level,10.10.2.7,1.3.6.1.2.1.43.11.1.1.9.1.1,1.3.6.1.2.1.43.11.1.1.8.1.2,24B6040
 Print Meter,10.10.2.7,1.3.6.1.2.1.43.10.2.1.4.1.1,M0,Replacement Model
