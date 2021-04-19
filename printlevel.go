@@ -9,9 +9,6 @@ import (
 	"os"
 	"strconv"
 	"sync"
-	"time"
-
-	"github.com/gosnmp/gosnmp"
 )
 
 type printerCol int
@@ -53,13 +50,16 @@ func main() {
 	wg.Wait()
 }
 
-func setupCSV(filename string) *csv.Reader {
+func setupCSV(filename string) (csvReader *csv.Reader) {
 	csvfile, err := os.Open(filename)
 	if err != nil {
 		printQuit(err)
 	}
 
-	return csv.NewReader(csvfile)
+	csvReader = csv.NewReader(csvfile)
+	csvReader.Comment = '#'
+
+	return
 }
 
 func run(wg *sync.WaitGroup, record []string) {
@@ -107,44 +107,4 @@ func isLow(v float32) string {
 		return "\u25c0\u25c0\u25c0"
 	}
 	return ""
-}
-
-func getSNMPInt(host string, oid string) int {
-	return int(gosnmp.ToBigInt(getSNMPValue(host, oid)).Int64())
-}
-
-func getSNMPString(host string, oid string) string {
-	return fmt.Sprintf("%s", getSNMPValue(host, oid))
-}
-
-func getSNMPValue(host string, oid string) interface{} {
-
-	params := &gosnmp.GoSNMP{
-		Target:    host,
-		Port:      161,
-		Community: "public",
-		Version:   gosnmp.Version2c,
-		//Logger:    log.New(os.Stdout, "", 0),
-		Timeout: time.Duration(2) * time.Second,
-	}
-
-	if err := params.Connect(); err != nil {
-		printQuit(err)
-	}
-	defer params.Conn.Close()
-
-	retVal, err := params.Get([]string{oid})
-	if err != nil {
-		printQuit(err)
-	}
-	return retVal.Variables[0].Value
-
-}
-func parseOID(oid string) (isOID bool, retVal string) {
-	if oid[0] == 'M' {
-		isOID, retVal = false, oid[1:]
-	} else {
-		isOID, retVal = true, oid
-	}
-	return
 }
