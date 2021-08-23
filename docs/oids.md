@@ -12,6 +12,23 @@ Generic
 	oid_sys_model    string = "1.3.6.1.2.1.1.1.0"
 ```
 
+iso.3.6.1.2.1.25.3.5.1.1.1 = Status
+3 = idle
+4 = printing
+5 = warmup
+
+iso.3.6.1.2.1.25.3.5.1.2 = Error State
+
+Bit # | Error
+0 | Low Papoer
+1 | No PAper
+2 | Low Toner
+3 | No Toner
+4 | door Open
+5 | jammed
+6 | offline
+7 | service request
+
 Konica Color (bizhub )
 ----------------------
 
